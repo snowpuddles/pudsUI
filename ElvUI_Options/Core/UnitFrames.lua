@@ -1129,6 +1129,8 @@ Colors.healthGroup.args.healthBreak.args.good = ACH:Color(L["Good"], nil, 5)
 Colors.healthGroup.args.healthBreak.args.neutral = ACH:Color(L["Neutral"], nil, 6)
 Colors.healthGroup.args.healthBreak.args.bad = ACH:Color(L["Bad"], nil, 7)
 
+Colors.healthGroup.args.useRoleColor = ACH:Toggle(L["useRoleColor"], L["useRoleColor."], 1)
+
 Colors.powerGroup = ACH:Group(L["Power"], nil, nil, nil, function(info) return E.db.unitframe.colors[info[#info]] end, function(info, value) E.db.unitframe.colors[info[#info]] = value UF:Update_AllFrames() end)
 Colors.powerGroup.args.transparentPower = ACH:Toggle(L["Transparent"], L["Make textures transparent."], 1)
 Colors.powerGroup.args.invertPower = ACH:Toggle(L["Invert Colors"], L["Invert foreground and background colors."], 2, nil, nil, nil, nil, nil, function() return not E.db.unitframe.colors.transparentPower end)

@@ -88,10 +88,22 @@ local function UpdateColor(self, event, unit)
 	local element = self.Health
 
 	local r, g, b, color
+	local role = UnitGroupRolesAssigned(unit)
+
 	if(element.colorDisconnected and not UnitIsConnected(unit)) then
 		color = self.colors.disconnected
 	elseif(element.colorTapping and not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
 		color = self.colors.tapped
+	elseif(element.colorRole and UnitIsPlayer(unit) and role ~= 'NONE') then
+		if role == 'DAMAGER' then
+			r, g, b = 1, 0, 0
+		end
+		if role == 'HEALER' then
+			r, g, b = 0, 1, 0
+		end
+		if role == 'TANK' then
+			r, g, b = 0, 0, 1
+		end
 	elseif(element.colorHappiness and not oUF.isRetail and PlayerClass == "HUNTER" and UnitIsUnit(unit, "pet") and GetPetHappiness()) then
 		color = self.colors.happiness[GetPetHappiness()]
 	elseif(element.colorThreat and not UnitPlayerControlled(unit) and UnitThreatSituation('player', unit)) then
@@ -328,6 +340,10 @@ local function Enable(self)
 
 		if(element.colorTapping) then
 			oUF:RegisterEvent(self, 'UNIT_FACTION', ColorPath)
+		end
+
+		if(element.colorRole) then
+			oUF:RegisterEvent(self, 'PLAYER_ROLES_ASSIGNED', ColorPath)
 		end
 
 		if(element.colorThreat) then

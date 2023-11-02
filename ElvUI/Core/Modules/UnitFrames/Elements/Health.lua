@@ -13,6 +13,7 @@ local UnitIsConnected = UnitIsConnected
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost
 local UnitIsCharmed = UnitIsCharmed
 local UnitIsEnemy = UnitIsEnemy
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 
 function UF.HealthClipFrame_OnUpdate(clipFrame)
 	UF.HealthClipFrame_HealComm(clipFrame.__frame)
@@ -70,6 +71,7 @@ function UF:Configure_HealthBar(frame)
 	health.colorHealth = nil
 	health.colorClass = nil
 	health.colorReaction = nil
+	health.colorRole = nil
 
 	if db.colorOverride and db.colorOverride == 'FORCE_ON' then
 		health.colorClass = true
@@ -80,6 +82,8 @@ function UF:Configure_HealthBar(frame)
 		else
 			health.colorHealth = true
 		end
+	elseif UF.db.colors.useRoleColor then
+		health.colorRole = true
 	else
 		if E.Retail and UF.db.colors.healthselection then
 			colorSelection = true
