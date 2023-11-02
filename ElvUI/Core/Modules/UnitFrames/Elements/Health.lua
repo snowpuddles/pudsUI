@@ -13,6 +13,7 @@ local UnitIsConnected = UnitIsConnected
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost
 local UnitIsCharmed = UnitIsCharmed
 local UnitIsEnemy = UnitIsEnemy
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 
 function UF.HealthClipFrame_OnUpdate(clipFrame)
 	UF.HealthClipFrame_HealComm(clipFrame.__frame)
@@ -239,6 +240,22 @@ function UF:PostUpdateHealthColor(unit, r, g, b)
 		if color then
 			self:SetStatusBarColor(color.r, color.g, color.b)
 		end
+	end
+
+	local role = (E.Retail or E.Wrath) and UnitGroupRolesAssigned(unit)
+	if self.isForced and role == 'NONE' then
+		local rnd = random(1, 3)
+		role = rnd == 1 and 'TANK' or (rnd == 2 and 'HEALER' or (rnd == 3 and 'DAMAGER'))
+	end
+	-- print("Please omg", role, unit)
+	if role == 'DAMAGER' then
+		self:SetStatusBarColor(1, 0, 0)
+	end
+	if role == 'HEALER' then
+		self:SetStatusBarColor(0, 1, 0)
+	end
+	if role == 'TANK' then
+		self:SetStatusBarColor(0, 0, 1)
 	end
 
 	-- Charmed player should have hostile color
