@@ -97,11 +97,9 @@ local function UpdateColor(self, event, unit)
 	elseif(element.colorRole and UnitIsPlayer(unit) and role ~= 'NONE') then
 		if role == 'DAMAGER' then
 			r, g, b = 1, 0, 0
-		end
-		if role == 'HEALER' then
+		elseif role == 'HEALER' then
 			r, g, b = 0, 1, 0
-		end
-		if role == 'TANK' then
+		elseif role == 'TANK' then
 			r, g, b = 0, 0, 1
 		end
 	elseif(element.colorHappiness and not oUF.isRetail and PlayerClass == "HUNTER" and UnitIsUnit(unit, "pet") and GetPetHappiness()) then
