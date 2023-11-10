@@ -1,7 +1,7 @@
 -- License: LICENSE.txt
 
 local MAJOR_VERSION = "LibActionButton-1.0-ElvUI"
-local MINOR_VERSION = 44 -- the real minor version is 107
+local MINOR_VERSION = 46 -- the real minor version is 107
 
 local LibStub = LibStub
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
@@ -1822,9 +1822,9 @@ function Update(self, fromUpdateConfig)
 
 	local isTypeAction = self._state_type == 'action'
 	if isTypeAction then
-		local actionType, actionID = GetActionInfo(self._state_action)
+		local actionType, actionID, subType = GetActionInfo(self._state_action)
 		local actionSpell, actionMacro, actionFlyout = actionType == 'spell', actionType == 'macro', actionType == 'flyout'
-		local macroSpell = actionMacro and GetMacroSpell(actionID) or nil
+		local macroSpell = actionMacro and ((WoWRetail and subType == 'spell' and actionID) or (not WoWRetail and GetMacroSpell(actionID))) or nil
 		local spellID = (actionSpell and actionID) or macroSpell
 		local spellName = spellID and GetSpellInfo(spellID) or nil
 
@@ -2460,11 +2460,15 @@ Action.IsUnitInRange           = function(self, unit) return IsActionInRange(sel
 Action.SetTooltip              = function(self) return GameTooltip:SetAction(self._state_action) end
 Action.GetSpellId              = function(self)
 	if self._state_type == "action" then
-		local actionType, id, _subType = GetActionInfo(self._state_action)
+		local actionType, id, subType = GetActionInfo(self._state_action)
 		if actionType == "spell" then
 			return id
 		elseif actionType == "macro" then
-			return (GetMacroSpell(id))
+			if WoWRetail then
+				return (subType == "spell" and id) or nil
+			else
+				return (GetMacroSpell(id))
+			end
 		end
 	end
 end

@@ -194,7 +194,7 @@ function TT:RemoveTrashLines(tt)
 	end
 end
 
-function TT:GetLevelLine(tt, offset)
+function TT:GetLevelLine(tt, offset, raw)
 	if tt:IsForbidden() then return end
 
 	local info = tt:GetTooltipData()
@@ -206,7 +206,11 @@ function TT:GetLevelLine(tt, offset)
 
 		local lower = strlower(text)
 		if lower and (strfind(lower, LEVEL1) or strfind(lower, LEVEL2)) then
-			return _G['GameTooltipTextLeft'..i], _G['GameTooltipTextLeft'..i+1] or nil
+			if raw then
+				return line, info.lines[i+1]
+			else
+				return _G['GameTooltipTextLeft'..i], _G['GameTooltipTextLeft'..i+1]
+			end
 		end
 	end
 end
@@ -305,7 +309,7 @@ function TT:SetUnitText(tt, unit, isPlayerUnit)
 			if isPetCompanion or (E.Retail and UnitIsWildBattlePet(unit)) then
 				level = UnitBattlePetLevel(unit)
 
-				local petType = UnitBattlePetType(unit)
+				local petType = UnitBattlePetType(unit) + 1
 				local petClass = _G['BATTLE_PET_NAME_'..petType]
 				if creatureType then
 					creatureType = format('%s %s', creatureType, petClass)
@@ -1015,6 +1019,7 @@ function TT:Initialize()
 	local statusBar = GameTooltipStatusBar
 	statusBar:Height(TT.db.healthBar.height)
 	statusBar:SetScript('OnValueChanged', nil) -- Do we need to unset this?
+	statusBar:SetMinMaxValues(-0.00001, 1)
 	GameTooltip.StatusBar = statusBar
 
 	local statusText = statusBar:CreateFontString(nil, 'OVERLAY')
