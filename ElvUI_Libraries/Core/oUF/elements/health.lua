@@ -376,6 +376,7 @@ local function Disable(self)
 		oUF:UnregisterEvent(self, 'PARTY_MEMBER_ENABLE', ColorPath)
 		oUF:UnregisterEvent(self, 'PARTY_MEMBER_DISABLE', ColorPath)
 		oUF:UnregisterEvent(self, 'UNIT_THREAT_LIST_UPDATE', ColorPath)
+		oUF:UnregisterEvent(self, 'PLAYER_ROLES_ASSIGNED', ColorPath)
 	end
 end
 
