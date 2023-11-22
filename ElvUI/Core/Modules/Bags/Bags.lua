@@ -20,7 +20,6 @@ local GameTooltip = GameTooltip
 local GameTooltip_Hide = GameTooltip_Hide
 local GetBindingKey = GetBindingKey
 local GetCursorMoney = GetCursorMoney
-local GetCVarBool = GetCVarBool
 local GetInventoryItemTexture = GetInventoryItemTexture
 local GetItemInfo = GetItemInfo
 local GetItemQualityColor = GetItemQualityColor
@@ -67,6 +66,7 @@ local C_NewItems_IsNewItem = C_NewItems.IsNewItem
 local C_NewItems_RemoveNewItem = C_NewItems.RemoveNewItem
 local C_Item_IsBound = C_Item.IsBound
 
+local GetCVarBool = C_CVar.GetCVarBool
 local SetCurrencyBackpack = SetCurrencyBackpack or (C_CurrencyInfo and C_CurrencyInfo.SetCurrencyBackpack)
 local SortBags = SortBags or (C_Container and C_Container.SortBags)
 local SortBankBags = SortBankBags or (C_Container and C_Container.SortBankBags)
@@ -98,11 +98,11 @@ local LE_ITEM_CLASS_QUESTITEM = LE_ITEM_CLASS_QUESTITEM
 local REAGENTBANK_PURCHASE_TEXT = REAGENTBANK_PURCHASE_TEXT
 local BINDING_NAME_TOGGLEKEYRING = BINDING_NAME_TOGGLEKEYRING
 
-local BANK_CONTAINER = BANK_CONTAINER
-local BACKPACK_CONTAINER = BACKPACK_CONTAINER
-local REAGENTBANK_CONTAINER = REAGENTBANK_CONTAINER
-local KEYRING_CONTAINER = KEYRING_CONTAINER
-local REAGENT_CONTAINER = E.Retail and 5 or math.huge -- impossible id to prevent code on classic
+local BANK_CONTAINER = Enum.BagIndex.Bank
+local BACKPACK_CONTAINER = Enum.BagIndex.Backpack
+local REAGENTBANK_CONTAINER = Enum.BagIndex.Reagentbank
+local KEYRING_CONTAINER = Enum.BagIndex.Keyring
+local REAGENT_CONTAINER = Enum.BagIndex.ReagentBag
 
 local BAG_FILTER_ASSIGN_TO = BAG_FILTER_ASSIGN_TO
 local BAG_FILTER_CLEANUP = BAG_FILTER_CLEANUP
@@ -1817,6 +1817,7 @@ function B:ConstructContainerFrame(name, isBank)
 			f.reagentToggle:SetScript('OnClick', function()
 				PlaySound(841) --IG_CHARACTER_INFO_TAB
 				B:ShowBankTab(f, f.holderFrame:IsShown())
+				B:SetBankSelectedTab() -- the hook doesnt trigger by this button
 			end)
 
 			--Deposite Reagents Button
@@ -2185,7 +2186,9 @@ function B:ToggleSortButtonState(isBank)
 end
 
 function B:ContainerOnShow()
-	B:SetListeners(self)
+	if not self.sortingSlots then
+		B:SetListeners(self)
+	end
 end
 
 function B:ContainerOnHide()
@@ -2250,11 +2253,15 @@ function B:CloseBags()
 	TT:GameTooltip_SetDefaultAnchor(GameTooltip)
 end
 
+function B:SetBankSelectedTab()
+	_G.BankFrame.selectedTab = B.BankTab or 1
+end
+
 function B:ShowBankTab(f, showReagent)
-	local previousTab = _G.BankFrame.selectedTab
+	local previousTab = B.BankTab
 
 	if showReagent then
-		_G.BankFrame.selectedTab = 2
+		B.BankTab = 2
 
 		if E.Retail then
 			f.reagentFrame:Show()
@@ -2265,7 +2272,7 @@ function B:ShowBankTab(f, showReagent)
 		f.holderFrame:Hide()
 		f.editBox:Point('RIGHT', f.sortButton, 'LEFT', -5, 0)
 	else
-		_G.BankFrame.selectedTab = 1
+		B.BankTab = 1
 
 		if E.Retail then
 			f.reagentFrame:Hide()
@@ -2277,7 +2284,7 @@ function B:ShowBankTab(f, showReagent)
 		f.editBox:Point('RIGHT', f.fullBank and f.bagsButton or f.purchaseBagButton, 'LEFT', -5, 0)
 	end
 
-	if previousTab ~= _G.BankFrame.selectedTab then
+	if previousTab ~= B.BankTab then
 		B:Layout(true)
 	else
 		B:UpdateLayout(f)
@@ -2329,7 +2336,7 @@ function B:OpenBank()
 
 	-- allow opening reagent tab directly by holding Shift
 	-- keep this over update slots for bank slot assignments
-	B:ShowBankTab(B.BankFrame, IsShiftKeyDown())
+	B:ShowBankTab(B.BankFrame, E.Retail and IsShiftKeyDown())
 
 	if B.BankFrame.firstOpen then
 		B:UpdateAllSlots(B.BankFrame)
@@ -2913,6 +2920,7 @@ function B:Initialize()
 	B:SecureHook('ToggleBag', 'ToggleBags')
 	B:SecureHook('ToggleAllBags', 'ToggleBackpack')
 	B:SecureHook('ToggleBackpack')
+	B:SecureHook('BankFrame_ShowPanel', 'SetBankSelectedTab')
 
 	B:DisableBlizzard()
 	B:UpdateGoldText()

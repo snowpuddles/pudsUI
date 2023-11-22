@@ -3,12 +3,15 @@ local M = E:GetModule('WorldMap')
 
 local _G = _G
 local strfind = strfind
-local GetCVar = GetCVar
+
 local CreateFrame = CreateFrame
 local hooksecurefunc = hooksecurefunc
 local IsPlayerMoving = IsPlayerMoving
 local SetUIPanelAttribute = SetUIPanelAttribute
 local PlayerMovementFrameFader = PlayerMovementFrameFader
+
+local GetCVar = C_CVar.GetCVar
+
 local MOUSE_LABEL = MOUSE_LABEL:gsub('|[TA].-|[ta]','')
 local PLAYER = PLAYER
 
@@ -308,7 +311,7 @@ function M:Initialize()
 	-- Enable/Disable map fading when moving
 	-- currently we dont need to touch this cvar because we have our own control for this currently
 	-- see the comment in `M:UpdateMapFade` about `durationSec` for more information
-	-- SetCVar('mapFade', E.global.general.fadeMapWhenMoving and 1 or 0)
+	-- E:SetCVar('mapFade', E.global.general.fadeMapWhenMoving and 1 or 0)
 end
 
 E:RegisterModule(M:GetName())

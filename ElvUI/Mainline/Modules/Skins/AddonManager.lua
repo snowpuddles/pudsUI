@@ -3,10 +3,12 @@ local S = E:GetModule('Skins')
 
 local _G = _G
 local unpack = unpack
-local GetAddOnInfo = GetAddOnInfo
-local GetAddOnEnableState = GetAddOnEnableState
-local UIDropDownMenu_GetSelectedValue = UIDropDownMenu_GetSelectedValue
 local hooksecurefunc = hooksecurefunc
+
+local UIDropDownMenu_GetSelectedValue = UIDropDownMenu_GetSelectedValue
+
+local GetAddOnInfo = C_AddOns and C_AddOns.GetAddOnInfo
+local GetAddOnEnableState = C_AddOns and C_AddOns.GetAddOnEnableState
 
 local function HandleButton(entry, addonIndex)
 	if not entry.isSkinned then
@@ -21,7 +23,7 @@ local function HandleButton(entry, addonIndex)
 	if character == true then
 		character = nil
 	else
-		checkall = GetAddOnEnableState(nil, addonIndex)
+		checkall = GetAddOnEnableState(addonIndex)
 	end
 
 	entry.Title:SetFontObject('ElvUIFontNormal')
@@ -30,7 +32,7 @@ local function HandleButton(entry, addonIndex)
 	entry.Reload:SetTextColor(1.0, 0.3, 0.3)
 	entry.LoadAddonButton.Text:SetFontObject('ElvUIFontSmall')
 
-	local checkstate = GetAddOnEnableState(character, addonIndex)
+	local checkstate = GetAddOnEnableState(addonIndex, character)
 	local enabledForSome = not character and checkstate == 1
 	local enabled = checkstate > 0
 	local disabled = not enabled or enabledForSome

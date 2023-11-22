@@ -23,7 +23,6 @@ local GetBNPlayerLink = GetBNPlayerLink
 local GetChannelName = GetChannelName
 local GetChatWindowInfo = GetChatWindowInfo
 local GetCursorPosition = GetCursorPosition
-local GetCVar, GetCVarBool = GetCVar, GetCVarBool
 local GetGuildRosterMOTD = GetGuildRosterMOTD
 local GetInstanceInfo = GetInstanceInfo
 local GetMouseFocus = GetMouseFocus
@@ -54,7 +53,6 @@ local UnitIsUnit = UnitIsUnit
 local UnitName = UnitName
 
 local C_Club_GetInfoFromLastCommunityChatLine = C_Club.GetInfoFromLastCommunityChatLine
-local C_DateAndTime_GetCurrentCalendarTime = C_DateAndTime.GetCurrentCalendarTime
 local C_LFGList_GetActivityInfoTable = C_LFGList.GetActivityInfoTable
 local C_LFGList_GetSearchResultInfo = C_LFGList.GetSearchResultInfo
 local C_VoiceChat_GetMemberName = C_VoiceChat.GetMemberName
@@ -67,6 +65,9 @@ local UNKNOWN = UNKNOWN
 
 local GetGroupMembers = E.Retail and C_SocialQueue.GetGroupMembers
 local GetGroupQueues = E.Retail and C_SocialQueue.GetGroupQueues
+
+local GetCVar = C_CVar.GetCVar
+local GetCVarBool = C_CVar.GetCVarBool
 
 local IsChatLineCensored = C_ChatInfo and C_ChatInfo.IsChatLineCensored
 local GetChannelRuleset = E.Retail and C_ChatInfo.GetChannelRuleset
@@ -910,26 +911,13 @@ function CH:StyleChat(frame)
 	frame.styled = true
 end
 
-function CH:GetChatTime()
-	local unix = time()
-	local realm = not CH.db.timeStampLocalTime and C_DateAndTime_GetCurrentCalendarTime()
-	if realm then -- blizzard is weird
-		realm.day = realm.monthDay
-		realm.min = realm.minute
-		realm.sec = date('%S', unix) -- no seconds from CalendarTime
-		realm = time(realm)
-	end
-
-	return realm or unix
-end
-
 function CH:AddMessageEdits(frame, msg, isHistory, historyTime)
 	if not strmatch(msg, '^|Helvtime|h') and not strmatch(msg, '^|Hcpl:') then
 		local historyTimestamp --we need to extend the arguments on AddMessage so we can properly handle times without overriding
 		if isHistory == 'ElvUI_ChatHistory' then historyTimestamp = historyTime end
 
 		if CH.db.timeStampFormat and CH.db.timeStampFormat ~= 'NONE' then
-			local timeStamp = BetterDate(CH.db.timeStampFormat, historyTimestamp or CH:GetChatTime())
+			local timeStamp = BetterDate(CH.db.timeStampFormat, historyTimestamp or E:GetDateTime(CH.db.timeStampLocalTime, true))
 			timeStamp = gsub(timeStamp, ' ', '')
 			timeStamp = gsub(timeStamp, 'AM', ' AM')
 			timeStamp = gsub(timeStamp, 'PM', ' PM')
@@ -2762,7 +2750,7 @@ function CH:SaveChatHistory(event, ...)
 
 	if #tempHistory > 0 and not CH:MessageIsProtected(tempHistory[1]) then
 		tempHistory[50] = event
-		tempHistory[51] = CH:GetChatTime()
+		tempHistory[51] = E:GetDateTime(CH.db.timeStampLocalTime, true)
 
 		local coloredName, battleTag
 		if tempHistory[13] and tempHistory[13] > 0 then coloredName, battleTag = CH:GetBNFriendColor(tempHistory[2], tempHistory[13], true) end

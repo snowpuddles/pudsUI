@@ -11,12 +11,10 @@ local tremove, tContains, tinsert, wipe = tremove, tContains, tinsert, wipe
 local format, error, ipairs, ceil = format, error, ipairs, ceil
 
 local CreateFrame = CreateFrame
-local IsAddOnLoaded = IsAddOnLoaded
 local DeleteCursorItem = DeleteCursorItem
 local MoneyFrame_Update = MoneyFrame_Update
 local UnitIsDeadOrGhost, InCinematic = UnitIsDeadOrGhost, InCinematic
 local PurchaseSlot, GetBankSlotCost = PurchaseSlot, GetBankSlotCost
-local SetCVar, EnableAddOn, DisableAddOn = SetCVar, EnableAddOn, DisableAddOn
 local ReloadUI, PlaySound, StopMusic = ReloadUI, PlaySound, StopMusic
 local StaticPopup_Resize = StaticPopup_Resize
 local GetBindingFromClick = GetBindingFromClick
@@ -24,6 +22,10 @@ local GetBindingFromClick = GetBindingFromClick
 local AutoCompleteEditBox_OnEnterPressed = AutoCompleteEditBox_OnEnterPressed
 local AutoCompleteEditBox_OnTextChanged = AutoCompleteEditBox_OnTextChanged
 local ChatEdit_FocusActiveWindow = ChatEdit_FocusActiveWindow
+
+local DisableAddOn = (C_AddOns and C_AddOns.DisableAddOn) or DisableAddOn
+local EnableAddOn = (C_AddOns and C_AddOns.EnableAddOn) or EnableAddOn
+local IsAddOnLoaded = (C_AddOns and C_AddOns.IsAddOnLoaded) or IsAddOnLoaded
 local PickupContainerItem = (C_Container and C_Container.PickupContainerItem) or PickupContainerItem
 
 local STATICPOPUP_TEXTURE_ALERT = STATICPOPUP_TEXTURE_ALERT
@@ -44,7 +46,6 @@ E.PopupDialogs.ELVUI_UPDATE_AVAILABLE = {
 		self.editBox.width = self.editBox:GetWidth()
 		self.editBox:Width(220)
 		self.editBox:SetText(DOWNLOAD_URL)
-		self.editBox:HighlightText()
 		ChatEdit_FocusActiveWindow()
 	end,
 	OnHide = function(self)
@@ -67,7 +68,7 @@ E.PopupDialogs.ELVUI_UPDATE_AVAILABLE = {
 		end
 
 		self:HighlightText()
-		self:ClearFocus()
+
 		ChatEdit_FocusActiveWindow()
 	end,
 	OnEditFocusGained = function(self)
@@ -87,7 +88,6 @@ E.PopupDialogs.ELVUI_EDITBOX = {
 		self.editBox:AddHistoryLine('text')
 		self.editBox.temptxt = data
 		self.editBox:SetText(data)
-		self.editBox:HighlightText()
 		self.editBox:SetJustifyH('CENTER')
 	end,
 	OnHide = function(self)
@@ -105,8 +105,8 @@ E.PopupDialogs.ELVUI_EDITBOX = {
 		if self:GetText() ~= self.temptxt then
 			self:SetText(self.temptxt)
 		end
+
 		self:HighlightText()
-		self:ClearFocus()
 	end,
 	whileDead = 1,
 	preferredIndex = 3,
@@ -386,7 +386,7 @@ E.PopupDialogs.SCRIPT_PROFILE = {
 	button1 = L["Disable"],
 	button2 = L["Continue"],
 	OnAccept = function()
-		SetCVar('scriptProfile', 0)
+		E:SetCVar('scriptProfile', 0)
 		ReloadUI()
 	end,
 	showAlert = 1,

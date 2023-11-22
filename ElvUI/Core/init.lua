@@ -4,22 +4,29 @@
 		local E, L, V, P, G = unpack(ElvUI) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 ]]
 
-local _G, next, strfind = _G, next, strfind
-local gsub, tinsert, type = gsub, tinsert, type
+local _G = _G
+local gsub, tinsert, next = gsub, tinsert, next
+local tostring, strfind, type = tostring, strfind, type
 
 local CreateFrame = CreateFrame
-local DisableAddOn = DisableAddOn
-local GetAddOnEnableState = GetAddOnEnableState
 local GetBuildInfo = GetBuildInfo
 local GetLocale = GetLocale
 local GetTime = GetTime
-local IsAddOnLoaded = IsAddOnLoaded
 local ReloadUI = ReloadUI
 local UIParent = UIParent
 
 local UIDropDownMenu_SetAnchor = UIDropDownMenu_SetAnchor
+
+local DisableAddOn = (C_AddOns and C_AddOns.DisableAddOn) or DisableAddOn
+local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+local IsAddOnLoaded = (C_AddOns and C_AddOns.IsAddOnLoaded) or IsAddOnLoaded
 local IsHardcoreActive = C_GameRules and C_GameRules.IsHardcoreActive
-local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+
+local C_AddOns_GetAddOnEnableState = C_AddOns and C_AddOns.GetAddOnEnableState
+local GetAddOnEnableState = GetAddOnEnableState -- eventually this will be on C_AddOns and args swap
+
+local GetCVar = C_CVar.GetCVar
+local SetCVar = C_CVar.SetCVar
 
 -- GLOBALS: ElvCharacterDB, ElvPrivateDB, ElvDB, ElvCharacterData, ElvPrivateData, ElvData
 
@@ -245,6 +252,13 @@ do
 	end
 end
 
+function E:SetCVar(cvar, value, ...)
+	local valstr = ((type(value) == 'boolean') and (value and '1' or '0')) or tostring(value)
+	if GetCVar(cvar) ~= valstr then
+		SetCVar(cvar, valstr, ...)
+	end
+end
+
 function E:SetEasyMenuAnchor(menu, frame)
 	local point = E:GetScreenQuadrant(frame)
 	local bottom = point and strfind(point, 'BOTTOM')
@@ -325,7 +339,11 @@ function E:OnInitialize()
 		E.Minimap:SetGetMinimapShape() -- This is just to support for other mods, keep below UIMult
 	end
 
-	if GetAddOnEnableState(E.myname, 'Tukui') == 2 then
+	if C_AddOns_GetAddOnEnableState then
+		if C_AddOns_GetAddOnEnableState('Tukui', E.myname) == 2 then
+			E:StaticPopup_Show('TUKUI_ELVUI_INCOMPATIBLE')
+		end
+	elseif GetAddOnEnableState(E.myname, 'Tukui') == 2 then
 		E:StaticPopup_Show('TUKUI_ELVUI_INCOMPATIBLE')
 	end
 end
