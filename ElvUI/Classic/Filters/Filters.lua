@@ -694,6 +694,7 @@ G.unitframe.aurawatch = {
 		[27681]	= Aura(27681, nil, 'TOPRIGHT', {0.2, 0.7, 0.2}, true), -- Prayer of Spirit
 		[976]	= Aura(976, {10957,10958}, 'BOTTOMLEFT', {0.7, 0.7, 0.7}, true), -- Shadow Protection
 		[27683]	= Aura(27683, nil, 'BOTTOMLEFT', {0.7, 0.7, 0.7}, true), -- Prayer of Shadow Protection
+		[6346]	= Aura(6346, nil, 'LEFT', {0.89, 0.45, 0}), -- Fear Ward
 		[17]	= Aura(17, {592,600,3747,6065,6066,10898,10899,10900,10901}, 'BOTTOM', {0.00, 0.00, 1.00}), -- Power Word: Shield
 		[139]	= Aura(139, {6074,6075,6076,6077,6078,10927,10928,10929,25315}, 'BOTTOMRIGHT', {0.33, 0.73, 0.75}), -- Renew
 	},
@@ -732,8 +733,7 @@ G.unitframe.aurawatch = {
 -- Season of Discovery Runes AuraWatch
 if E.ClassicSOD then
 	G.unitframe.aurawatch.DRUID[408120] = Aura(408120, nil, 'RIGHT', {0.38, 0.19, 0.43}) -- Wild Growth
-	G.unitframe.aurawatch.MAGE[401417] = Aura(401417, nil, 'RIGHT', {0.38, 0.19, 0.43}) -- Regeneration
-	G.unitframe.aurawatch.MAGE[412510] = Aura(412510, nil, 'BOTTOMRIGHT', {0.38, 0.19, 0.17}) -- Mass Regeneration
+	G.unitframe.aurawatch.MAGE[400735] = Aura(401417, nil, 'RIGHT', {0.38, 0.19, 0.43}) -- Temporal Beacon
 	G.unitframe.aurawatch.PRIEST[401877] = Aura(401877, nil, 'RIGHT', {0.00, 0.00, 0.90}) -- Prayer of Mending
 end
 
@@ -824,6 +824,11 @@ G.unitframe.ChannelTicks = {
 	[1159]	= 6, -- Heavy Linen Bandage
 	[746]	= 6, -- Linen Bandage
 }
+
+if E.ClassicSOD then
+	G.unitframe.ChannelTicks[402261] = 3 -- Penance (DPS)
+	G.unitframe.ChannelTicks[402277] = 3 -- Penance (Healing)
+end
 
 -- Spells that chain, second step
 G.unitframe.ChainChannelTicks = {}
